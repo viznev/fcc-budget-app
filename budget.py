@@ -36,4 +36,24 @@ class Category:
     return not (amount > self.get_balance())
 
 def create_spend_chart(categories):
-  return None
+  totalSpent = 0
+  categorySpent = {}
+  finalStr = 'Percentage spent by category'
+  for category in categories:
+    categorySpent[category.name] = {}
+    categorySpent[category.name]['amount'] = round(sum([abs(item['amount']) for item in category.ledger if item['amount'] < 0]), 2)
+    totalSpent += categorySpent[category.name]['amount']
+  categoryPercent = {k:(v['amount']/totalSpent*10*10) - ((v['amount']/totalSpent*10*10)%10) for k,v in categorySpent.items()}
+  for i in range(100, -10, -10):
+    finalStr += '\n' + str(i).rjust(3) + '| '
+    for category, percent in categoryPercent.items():
+      finalStr += 'o  ' if percent >= i else '   '
+  finalStr += '\n    -' + '-'*3*len(categoryPercent.keys())
+  for x in range(0, max(len(item) for item in categoryPercent)):
+    finalStr += '\n     '
+    for category in categoryPercent.keys():
+      try:
+        finalStr += category[x] + '  '
+      except:
+        finalStr += '   '
+  return finalStr
